@@ -1,8 +1,10 @@
-# LinearR
+# RealTimeLinearRegression
 
 **TODO: Add description**
 
 ## Installation
+
+
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `real_time_linear_regression` to your list of dependencies in `mix.exs`:
@@ -10,7 +12,7 @@ by adding `real_time_linear_regression` to your list of dependencies in `mix.exs
 ```elixir
 def deps do
   [
-    {:linear_r, "~> 0.1.0"}
+    {:real_time_linear_regression, "~> 0.1.0"}
   ]
 end
 ```

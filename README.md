@@ -1,4 +1,4 @@
-# RealTimeLinearRegression
+# Real Time Linear Regression Predictor in Elixir
 
 **TODO: Add description**
 

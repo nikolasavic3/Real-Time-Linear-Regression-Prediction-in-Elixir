@@ -1,71 +1,46 @@
 defmodule RealTimeLinearRegression do
-  @moduledoc """
-  Documentation for `LinearR`.
-  """
+  require Scholar.Linear.LinearRegression
 
-  @doc """
-  Hello world.
+  def predict_next_price() do
+    {tensor_x, tensor_y} = CryptoPriceFetcher.get_tensors_from_csv()
+    model = Scholar.Linear.LinearRegression.fit(tensor_x, tensor_y)
+    CryptoPriceFetcher.print_tensors(tensor_x, tensor_y)
+    x_prediction_value = get_x_for_prediction_or_stop(tensor_x, tensor_y)
+    prediction = Scholar.Linear.LinearRegression.predict(model, Nx.tensor(x_prediction_value))
+    IO.puts("The prediction for x=#{x_prediction_value} > #{inspect(prediction)}")
+    IO.puts("The model looks like this:\n#{inspect(model)}")
+  end
 
-  ## Examples
+  defp get_x_for_prediction_or_stop(x_tensor, y_tensor) do
+    x_string =
+      case IO.gets("for how many seconds you want to know the prediction for ? (stop) ") do
+        {:error, reason} ->
+          df = Explorer.DataFrame.new(%{time: Nx.to_list(x_tensor), price: Nx.to_list(y_tensor)})
+          Explorer.DataFrame.to_csv(df, "all_data.csv")
+          System.halt(0)
+          IO.puts(reason)
 
-      iex> LinearR.hello()
-      :world
+        x_string ->
+          case String.starts_with?(x_string, "stop") do
+            true ->
+              b = Explorer.Series.from_tensor(y_tensor)
+              a = Explorer.Series.from_tensor(x_tensor)
+              df = Explorer.DataFrame.new(%{time: a, price: b})
+              Explorer.DataFrame.to_csv(df, "all_data.csv")
 
-  """
+            false ->
+              x_string
+          end
+      end
 
-  # Nx.default_backend(EXLA.Backend)
-  # Nx.Defn.default_options(compiler: EXLA)
+    x_trimed = String.trim(x_string, "\n")
+    x_prediction_value = String.to_integer(x_trimed)
 
-  m = 1 * 10
-  b = 0 * 10
-
-  key = Nx.Random.key(42)
-  size = 4
-  # {x, new_key} = Nx.Random.uniform(key, 1, 0.1, shape: {size, 1})
-  x = Nx.iota({size, 1})
-
-  {noise_x, key} = Nx.Random.normal(key, 0.0, 0.1, shape: {size, 1})
-
-  y =
-    m
-    |> Nx.multiply(Nx.add(x, noise_x))
-    |> Nx.add(b)
-
-  # IO.puts("U IZRADI")
-
-  LinearRegression.prediction(x, y)
-  # model = Scholar.Linear.LinearRegression.fit(x, y)
-  # IO.inspect(model)
-
-  # IO.puts("x:")
-  # IO.inspect(x)
-
-  # IO.puts("y:")
-  # IO.inspect(y)
-
-  # x_2 = 1
-  # IO.puts("x_2:")
-  # IO.inspect(x_2)
-
-  # IO.puts("prediction for x_2:")
-  # prediction = Scholar.Linear.LinearRegression.predict(model, x_2)
-  # IO.inspect(prediction)
-
-  # x2 = Nx.concatenate([x, Nx.tensor([[x_2]])])
-  # IO.puts("new tenosor x2:")
-  # IO.inspect(x2)
-
-  # y_2 = 10
-  # IO.puts("Real value y2 for x2:")
-  # IO.inspect(y_2)
-
-  # y2 = Nx.concatenate([y, Nx.tensor([[y_2]])])
-  # IO.puts("new tenosor y2:")
-  # IO.inspect(y2)
-
-  # # defp predict(x_1, y_1, x_2) do
-  # model2 = Scholar.Linear.LinearRegression.fit(x2, y2)
-  # IO.puts("updated preditction: ")
-  # IO.inspect(Scholar.Linear.LinearRegression.predict(model2, 1))
-  # end
+    with {:ok, _, time} <- CryptoPriceFetcher.fetch_btc_price() do
+      t = time + x_prediction_value * 1000
+      t
+    else
+      {:error, _} = error -> error
+    end
+  end
 end

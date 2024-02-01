@@ -5,4 +5,6 @@ defmodule RealTimeLinearRegressionTest do
   test "greets the world" do
     assert RealTimeLinearRegression.hello() == :world
   end
+
+  test
 end

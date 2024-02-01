@@ -22,11 +22,14 @@ defmodule RealTimeLinearRegression.MixProject do
   defp deps do
     [
       {:scholar, "~> 0.1"},
-      {:nx, "~> 0.1"},
-      {:exla, "~> 0.5"},
+      {:nx, "~> 0.6.0"},
       {:vega_lite, "~> 0.1.6"},
       {:kino_vega_lite, "~> 0.1.6"},
-      {:scidata, "~> 0.1"}
+      {:scidata, "~> 0.1"},
+      {:httpoison, "~> 1.8"},
+      {:jason, "~> 1.0"},
+      {:tzdata, "~> 1.0"},
+      {:explorer, "~> 0.2.0"}
     ]
   end
 end

@@ -16,9 +16,6 @@ defmodule CryptoPriceFetcher do
   defp parse_price(body) do
     with {:ok, data} <- Jason.decode(body),
          %{"data" => %{"priceUsd" => price_usd}, "timestamp" => timestamp} <- data do
-      # current_time_utc = DateTime.utc_now()
-
-      # local_time = DateTime.shift_zone(current_time_utc, "Europe/Paris", Tzdata.TimeZoneDatabase)
       {:ok, price_usd, timestamp}
     else
       error -> {:error, error}
@@ -27,8 +24,6 @@ defmodule CryptoPriceFetcher do
 
   def update_price() do
     with {:ok, current_price, time} <- CryptoPriceFetcher.fetch_btc_price() do
-      IO.puts("ID")
-      IO.inspect(self())
       current_price_float = String.to_float(current_price)
       {x, y} = get_tensors_from_csv()
       updated_tensor_x = concatenate_number_to_tensor(x, time)
@@ -81,20 +76,14 @@ defmodule CryptoPriceFetcher do
     map = Explorer.DataFrame.to_series(df_all)
     old_x_vals = Explorer.Series.to_list(map["time"])
     old_y_vals = Explorer.Series.to_list(map["price"])
-    IO.puts("old")
-    IO.inspect(old_x_vals)
-    old_tensors_x = list_to_tensors(old_x_vals)
-    IO.puts("new")
-    IO.inspect(old_tensors_x)
-    old_tensors_y = list_to_tensors(old_y_vals)
+    old_tensors_x = list_element_numbers_to_tensors(old_x_vals)
+    old_tensors_y = list_element_numbers_to_tensors(old_y_vals)
     tensor_x = Nx.tensor(old_tensors_x)
-    IO.puts("tensor")
-    IO.inspect(tensor_x)
     tensor_y = Nx.tensor(old_tensors_y)
     {tensor_x, tensor_y}
   end
 
-  defp list_to_tensors(list) do
+  defp list_element_numbers_to_tensors(list) do
     Enum.map(list, fn x -> [x] end)
   end
 end

@@ -1,33 +1,59 @@
 <!doctype html>
 <html>
   <head>
-    <title>Embedding Vega-Lite</title>
-    <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
+    <title>Embedding Vega-Lite with Sliders</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
   </head>
   <body>
+    <div>Time Scale:</div>
+    <input type="range" id="timeMin" min="67" max="70" value="67"> Min
+    <input type="range" id="timeMax" min="67" max="70" value="68"> Max
+    <div>Price Scale:</div>
+    <input type="range" id="priceMin" min="42000" max="45000" value="42000"> Min
+    <input type="range" id="priceMax" min="42000" max="45000" value="42300"> Max
     <div id="vis"></div>
 
     <script type="text/javascript">
-      var yourVlSpec = {
-        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        description: 'A simple bar chart with embedded data.',
-        data: {url : "all_data.csv"},
-	      "transform": [
-          {
-            "calculate" : "(datum.time - 1700000000000) / 100000000", "as": "time"
-          }
-        ],
-        "mark": "point",  
-        "encoding": {
-          "x": {"field": "time", "type": "quantitative"},
-          "y": {"field": "price", "type": "quantitative", }
-  	      },
-          "width": 1600,
-          "height": 800  
-	};
-      vegaEmbed('#vis', yourVlSpec);
+      function renderChart(timeMin, timeMax, priceMin, priceMax) {
+        var yourVlSpec = {
+          $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+          description: 'A simple bar chart with embedded data.',
+          data: {url : "all_data.csv"},
+          transform: [
+            {"calculate": "(datum.time - 1700000000000) / 100000000", "as": "time"},
+            {"filter": `datum.time >= ${timeMin} && datum.time <= ${timeMax}`},
+            {"filter": `datum.price >= ${priceMin} && datum.price <= ${priceMax}`}
+          ],
+          mark: "point",
+          encoding: {
+            x: {"field": "time", "type": "quantitative", "scale": {"domain": [timeMin, timeMax]}},
+            y: {"field": "price", "type": "quantitative", "scale": {"domain": [priceMin, priceMax]}}
+          },
+          width: 1600,
+          height: 800 
+        };
+        vegaEmbed('#vis', yourVlSpec);
+      }
+
+      // Initial rendering of the chart
+      renderChart(67, 68, 42000, 42300);
+
+      // Listen to slider changes
+      document.getElementById('timeMin').addEventListener('input', updateChart);
+      document.getElementById('timeMax').addEventListener('input', updateChart);
+      document.getElementById('priceMin').addEventListener('input', updateChart);
+      document.getElementById('priceMax').addEventListener('input', updateChart);
+
+      function updateChart() {
+        var timeMin = parseFloat(document.getElementById('timeMin').value);
+        var timeMax = parseFloat(document.getElementById('timeMax').value);
+        var priceMin = parseFloat(document.getElementById('priceMin').value);
+        var priceMax = parseFloat(document.getElementById('priceMax').value);
+
+        renderChart(timeMin, timeMax, priceMin, priceMax);  
+      }
     </script>
   </body>
 </html>

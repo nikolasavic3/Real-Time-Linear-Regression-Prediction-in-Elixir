@@ -71,6 +71,26 @@ defmodule CryptoPriceFetcher do
     Explorer.DataFrame.to_csv(df, file)
   end
 
+  def save_normalised() do
+    df = Explorer.DataFrame.from_csv!("all_data.csv")
+
+    df_all =
+      Explorer.DataFrame.filter_with(df, fn df ->
+        Explorer.Series.greater_equal(df["time"], 1_706_860_840_143)
+      end)
+
+    normalized_df =
+      Explorer.DataFrame.mutate_with(df_all, fn df_all ->
+        var = Explorer.Series.variance(df_all["price"])
+        mean = Explorer.Series.mean(df_all["price"])
+        centered = Explorer.Series.subtract(df_all["price"], mean)
+        norm = Explorer.Series.divide(centered, var)
+        [price: norm]
+      end)
+
+    Explorer.DataFrame.to_csv(normalized_df, "normalised_data.csv")
+  end
+
   def get_tensors_from_csv() do
     df_all = Explorer.DataFrame.from_csv!("all_data.csv")
     map = Explorer.DataFrame.to_series(df_all)

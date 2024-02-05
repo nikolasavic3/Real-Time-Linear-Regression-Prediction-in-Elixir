@@ -1,3 +1,3 @@
-# Real-Time Linear Regression Predictor in Elixir
+# Real-Time Linear Regression Cryptocurrencies Predictor in Elixir
 
-Real-time linear regression model that predicts the y value for a given x value and takes the real y value and updates the model in a loop.
+A real-time linear regression model that predicts the price of BTC USDT pair given the elapsed future time in seconds. Continuous update of CSV tables. 

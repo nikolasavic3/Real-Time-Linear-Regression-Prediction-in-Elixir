@@ -21,7 +21,7 @@ cd real_time_linear_regression
 mix deps.get
 ```
 #### Usage
-Start the interactive elixir shell in two separate bash terminals by running the following command:
+You can use one bash terminal to run program, but I recomend using two. Start the interactive elixir shell in each bash terminal (or just one) by running the following command:
 ```shell
 iex -S mix
 ```
